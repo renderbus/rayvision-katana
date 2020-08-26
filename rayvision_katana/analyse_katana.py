@@ -168,7 +168,10 @@ class AnalyzeKatana(object):
         """
         exe_path = None
         if self.local_os == "linux":
-            pass
+            exe_path = "/opt/Foundry/Katana{}/katana".format(self.software_version)
+            if not os.path.isfile(exe_path):
+                self.logger.info("The linux software address is not found, please specify the software path directly")
+                exe_path = None
         else:
             location = self.location_from_reg(self.software_version)
             tmp_exe_path = os.path.join(location, "bin", "katanaBin.exe")
