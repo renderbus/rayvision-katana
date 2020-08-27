@@ -28,7 +28,7 @@ class AnalyzeKatana(object):
             software_version (str): Software version.
             project_name (str): The project name.
             plugin_config (dict): Plugin information.
-            render_software (str): Software name, Maya by default.
+            render_software (str): Software name, Katana by default.
             input_project_path (str): The working path of the scenario.
             local_os (str): System name, linux or windows.
             workspace (str): Analysis out of the result file storage path.
@@ -119,17 +119,17 @@ class AnalyzeKatana(object):
         """Get the path in the registry of the local CG.
 
         When the system environment is Windows or linux, get the path where the
-        local Maya startup file is located in the registry.
+        local Katana startup file is located in the registry.
 
         Args:
-            version (str): Maya version.
+            version (str): Katana version.
                 e.g.:
-                    "2018".
+                    "3.2v1".
 
         Returns:
-            str: The path where Maya's startup files are located.
+            str: The path where katana's startup files are located.
                 e.g.:
-                    "D:/Maya/Maya2018/".
+                    "C:/Program Files/Katana3.2v1/".
 
         """
         temp = 2
