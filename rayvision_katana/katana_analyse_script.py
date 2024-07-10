@@ -1,3 +1,4 @@
+import argparse
 import codecs
 import json
 import os
@@ -156,20 +157,24 @@ class ray_Katana_asset(ray_Katana):
 
 
 if __name__ == '__main__':
-    katana_scene = sys.argv[1]
-    task_json = sys.argv[2]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-task", help='task id', type=str)
+    parser.add_argument('-file', help='file path', type=str)
+    args = parser.parse_args()
+    katana_scene = args.file
+    json_path = args.task
+    task_json = os.path.join(json_path, "task.json")
     KatanaFile.Load(katana_scene)
-    print (katana_scene)
-    print (task_json)
-    print os.path.basename(sys.executable.lower())
+    print(katana_scene)
+    print(task_json)
+    print(os.path.basename(sys.executable.lower()))
     kanana_analyse = ray_Katana_rendernodes()
     kanana_analyse.kanana_rendernodes(task_json)
     katana_asset = ray_Katana_asset()
     task_dict = katana_asset.open_json(task_json)
     katana_asset.get_Alembic_In()
     katana_asset.get_PrmanShadingNode()
-    base_path = os.path.split(task_json)[0]
-    analyze_flag_file = os.path.join(base_path, "analyze_sucess")
+    analyze_flag_file = os.path.join(json_path, "analyze_sucess")
     with open(analyze_flag_file, "w"):
         pass
 

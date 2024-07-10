@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import traceback
+import threading
 
 from rayvision_utils import constants
 from rayvision_utils import utils
@@ -68,7 +69,7 @@ class AnalyzeKatana(object):
 
         local_os = self.check_local_os(local_os)
         self.local_os = local_os
-        self.tmp_mark = str(int(time.time()))
+        self.tmp_mark = str(int(time.time())) + str(self.get_current_id())
         workspace = os.path.join(self.check_workspace(workspace),
                                  self.tmp_mark)
         if not os.path.exists(workspace):
@@ -89,6 +90,13 @@ class AnalyzeKatana(object):
         self.task_info = {}
         self.asset_info = {}
         self.upload_info = {}
+
+    @staticmethod
+    def get_current_id():
+        if isinstance(threading.current_thread(), threading._MainThread):
+            return os.getpid()
+        else:
+            return threading.get_ident()
 
     @staticmethod
     def check_path(tmp_path):
@@ -302,12 +310,15 @@ class AnalyzeKatana(object):
         if not os.path.exists(exe_path):
             exe_path = self.analyse_cg_file()
         self.write_task_json()
-        analyse_script_name = "katana_analyse_script.py"
+        analyse_script_name = "Analyse.py"
         analyze_script_path = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                            analyse_script_name))
-        task_path = self.task_json.replace("\\", "/")
+        task_path = os.path.dirname(self.task_json).replace("\\", "/")
 
-        cmd = ('"{exe_path}" --script "{script_full_path}" "{cg_file}" "{task_path}"').format(
+        cmd = '"{exe_path}" --script "{script_full_path}" -task "{task_path}" -file "{cg_file}"'
+        if exe_path and (str(exe_path).endswith(('.sh', '.bat'))):
+            cmd = '"{exe_path}" "{script_full_path}" "{task_path}" "{cg_file}"'
+        cmd = cmd.format(
             exe_path=exe_path,
             script_full_path=analyze_script_path,
             cg_file=self.cg_file,
@@ -319,7 +330,10 @@ class AnalyzeKatana(object):
             self.add_tip(tips_code.UNKNOW_ERR, "")
             self.save_tips()
             raise AnalyseFailError
-
-        if not no_upload:
-            self.write_upload_json()
+        
+        self.tips_info = utils.json_load(self.tips_json)
+        self.asset_info = utils.json_load(self.asset_json)
+        self.task_info = utils.json_load(self.task_json)
+        # if not no_upload:
+        #     self.write_upload_json()
         return self
